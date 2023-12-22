@@ -55,11 +55,12 @@ jobs:
     - run: |
         terraform init
         terraform validate
+      working-directory: src
     - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
       id: upload
       with:
         workspace: ${{ env.TF_WORKSPACE }}
-        directory: src
+        directory: ./src
     - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
       with:
         workspace: ${{ env.TF_WORKSPACE }}
