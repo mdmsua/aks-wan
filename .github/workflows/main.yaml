@@ -1,0 +1,68 @@
+name: Deploy virtual WAN
+concurrency: ${{ inputs.geo }}
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TF_INPUT: 0
+  TF_WORKSPACE: ${{ inputs.geo }}
+  TF_IN_AUTOMATION: 1
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      geo:
+        required: true
+        type: string
+        description: Virtual WAN geography
+      cfg:
+        required: false
+        type: string
+        description: Configuration repository reference
+        default: main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: mdmsua/aks-cfg
+        path: cfg
+        ref: ${{ inputs.cfg }}
+        show-progress: false
+    - id: cfg
+      working-directory: cfg/wan
+      run: |
+        echo "cfg=$(kubectl kustomize overlays/$GEO | yq | 'del(.kind)|del(.metadata)' -o json)" >> "$GITHUB_OUTPUT"
+      env:
+        GEO: ${{ inputs.geo }}
+    - id: ref
+      run: |
+        echo "ref=$(cat $CFG | jq -r '.configuration.version')" >> "$GITHUB_OUTPUT"
+      env:
+        CGF: ${{ steps.cfg.outputs.cfg }}
+    - uses: actions/checkout@v4
+      with:
+        path: src
+        show-progress: false
+        ref: ${{ steps.ref.outputs.ref }}
+    - uses: hashicorp/setup-terraform@v3
+    - run: |
+        terraform init
+        terraform validate
+    - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1
+      id: upload
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        directory: .
+    - uses: hashicorp/tfc-workflows-github/actions/create-run@v1
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
+      env:
+        TF_VAR_configuration: ${{ steps.cfg.outputs.cfg }}

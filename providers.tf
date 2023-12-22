@@ -1,7 +1,8 @@
 terraform {
   cloud {
+    organization = "Megamango"
     workspaces {
-      tags = ["wan"]
+      project = "wan"
     }
   }
 
@@ -14,6 +15,7 @@ terraform {
 }
 
 provider "azurerm" {
+  tenant_id       = var.configuration.tenant_id
   subscription_id = var.configuration.subscription_id
   features {
     resource_group {
