@@ -59,7 +59,7 @@ jobs:
       id: upload
       with:
         workspace: ${{ env.TF_WORKSPACE }}
-        directory: .
+        directory: src
     - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
       with:
         workspace: ${{ env.TF_WORKSPACE }}
