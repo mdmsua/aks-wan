@@ -38,7 +38,7 @@ jobs:
     - id: cfg
       working-directory: cfg/wan
       run: |
-        echo "cfg=$(kubectl kustomize overlays/$GEO | yq | 'del(.kind)|del(.metadata)' -o json)" >> "$GITHUB_OUTPUT"
+        echo "cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json)" >> "$GITHUB_OUTPUT"
       env:
         GEO: ${{ inputs.geo }}
     - id: ref
