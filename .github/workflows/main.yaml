@@ -55,9 +55,12 @@ jobs:
       with:
         cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
     - run: |
+        terraform workspace select -or-create=true $GEO
         terraform init
         terraform validate
       working-directory: src
+      env:
+        GEO: ${{ inputs.geo }}
     - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
       id: upload
       with:
