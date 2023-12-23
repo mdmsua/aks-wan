@@ -58,7 +58,7 @@ jobs:
         terraform validate
       working-directory: src
       env:
-        GEO: ${{ inputs.geo }}
+        TF_WORKSPACE: ${{ inputs.geo }}
     - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
       id: upload
       with:
