@@ -7,7 +7,6 @@ permissions:
 
 env:
   TF_INPUT: 0
-  TF_WORKSPACE: ${{ inputs.geo }}
   TF_IN_AUTOMATION: 1
   TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
@@ -64,11 +63,11 @@ jobs:
     - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
       id: upload
       with:
-        workspace: ${{ env.TF_WORKSPACE }}
+        workspace: ${{ inputs.geo }}
         directory: ./src
     - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
       with:
-        workspace: ${{ env.TF_WORKSPACE }}
+        workspace: ${{ inputs.geo }}
         configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
       env:
         TF_VAR_configuration: ${{ steps.cfg.outputs.cfg }}
