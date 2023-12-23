@@ -3,6 +3,7 @@ terraform {
     organization = "Megamango"
     workspaces {
       project = "wan"
+      tags    = ["wan"]
     }
   }
 
