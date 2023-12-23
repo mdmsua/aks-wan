@@ -54,8 +54,8 @@ jobs:
       with:
         cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
     - run: |
-        terraform workspace select -or-create=true $GEO
         terraform init
+        terraform workspace select -or-create=true $GEO
         terraform validate
       working-directory: src
       env:
