@@ -8,6 +8,7 @@ permissions:
 env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
+  TF_ORGANIZATION: Megamango
 
 on:
   workflow_dispatch:
@@ -76,9 +77,12 @@ jobs:
       with:
         workspace: ${{ inputs.geo }}
         directory: .
+        token: ${{ secrets.TFC_TOKEN }}
+        speculative: false
     - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
       with:
         workspace: ${{ inputs.geo }}
         configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
+        token: ${{ secrets.TFC_TOKEN }}
       env:
         TF_VAR_configuration: ${{ needs.configuration.outputs.configuration }}
