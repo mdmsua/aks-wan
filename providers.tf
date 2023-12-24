@@ -1,10 +1,6 @@
 terraform {
   cloud {
     organization = "Megamango"
-    workspaces {
-      project = "wan"
-      tags    = ["wan"]
-    }
   }
 
   required_providers {
