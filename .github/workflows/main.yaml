@@ -8,7 +8,6 @@ permissions:
 env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
-  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
 on:
   workflow_dispatch:
@@ -50,7 +49,8 @@ jobs:
     with:
       workspaces: ${{ needs.configuration.outputs.workspace }}
     secrets:
-      token: ${{ secrets.TF_API_TOKEN }}
+      tfc-token: ${{ secrets.TFC_TOKEN }}
+      tfe-token: ${{ secrets.TFE_TOKEN }}
     needs: configuration
   main:
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
         ref: ${{ needs.configuration.outputs.reference }}
     - uses: hashicorp/setup-terraform@v3
       with:
-        cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
+        cli_config_credentials_token: ${{ secrets.TFC_TOKEN }}
     - run: |
         terraform init
         terraform validate
