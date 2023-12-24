@@ -37,19 +37,22 @@ jobs:
     - id: cfg
       working-directory: cfg/wan
       run: |
-        echo "cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc)" >> "$GITHUB_OUTPUT"
+        cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc)
+        echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
+        echo "ref=$(cat $cfg | jq -rc '.configuration.version')" >> "$GITHUB_OUTPUT"
+        echo "wss=$(jq -nrc --arg workspace $GEO '[$workspace]')" >> "$GITHUB_OUTPUT"
       env:
         GEO: ${{ inputs.geo }}
-    - id: ref
-      run: |
-        echo "ref=$(cat $CFG | jq -rc '.configuration.version')" >> "$GITHUB_OUTPUT"
-      env:
-        CGF: ${{ steps.cfg.outputs.cfg }}
+    - uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
+      with:
+        workspaces: ${{ steps.cfg.outputs.wss }}
+      secrets:
+        token: ${{ secrets.TF_API_TOKEN }}
     - uses: actions/checkout@v4
       with:
         path: src
         show-progress: false
-        ref: ${{ steps.ref.outputs.ref }}
+        ref: ${{ steps.cfg.outputs.ref }}
     - uses: hashicorp/setup-terraform@v3
       with:
         cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
