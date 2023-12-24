@@ -24,18 +24,20 @@ on:
         default: main
 
 jobs:
-  main:
+  configuration:
     runs-on: ubuntu-latest
-    environment: main
+    outputs:
+      configuration: ${{ steps.cfg.outputs.cfg }}
+      reference: ${{ steps.cfg.outputs.ref }}
+      workspace: ${{ steps.cfg.outputs.wss }}
     steps:
     - uses: actions/checkout@v4
       with:
         repository: mdmsua/aks-cfg
-        path: cfg
         ref: ${{ inputs.cfg }}
         show-progress: false
     - id: cfg
-      working-directory: cfg/wan
+      working-directory: wan
       run: |
         cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc)
         echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
@@ -43,33 +45,40 @@ jobs:
         echo "wss=$(jq -nrc --arg workspace $GEO '[$workspace]')" >> "$GITHUB_OUTPUT"
       env:
         GEO: ${{ inputs.geo }}
-    - uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
-      with:
-        workspaces: ${{ steps.cfg.outputs.wss }}
-      secrets:
-        token: ${{ secrets.TF_API_TOKEN }}
+  workspace:
+    uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
+    with:
+      workspaces: ${{ needs.configuration.outputs.workspace }}
+    secrets:
+      token: ${{ secrets.TF_API_TOKEN }}
+    needs: configuration
+  main:
+    runs-on: ubuntu-latest
+    environment: main
+    needs:
+    - configuration
+    - workspace
+    steps:
     - uses: actions/checkout@v4
       with:
-        path: src
         show-progress: false
-        ref: ${{ steps.cfg.outputs.ref }}
+        ref: ${{ needs.configuration.outputs.reference }}
     - uses: hashicorp/setup-terraform@v3
       with:
         cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
     - run: |
         terraform init
         terraform validate
-      working-directory: src
       env:
         TF_WORKSPACE: ${{ inputs.geo }}
     - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
       id: upload
       with:
         workspace: ${{ inputs.geo }}
-        directory: ./src
+        directory: .
     - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
       with:
         workspace: ${{ inputs.geo }}
         configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
       env:
-        TF_VAR_configuration: ${{ steps.cfg.outputs.cfg }}
+        TF_VAR_configuration: ${{ needs.configuration.outputs.configuration }}
