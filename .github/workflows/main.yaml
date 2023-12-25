@@ -9,6 +9,7 @@ env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
   TF_ORGANIZATION: Megamango
+  TF_WORKSPACE: wan-${{ inputs.geo }}
 
 on:
   workflow_dispatch:
@@ -70,19 +71,17 @@ jobs:
       - run: |
           terraform init
           terraform validate
-        env:
-          TF_WORKSPACE: ${{ inputs.geo }}
       - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
         id: upload
         with:
-          workspace: ${{ inputs.geo }}
+          workspace: ${{ env.TF_WORKSPACE }}
           directory: .
           token: ${{ secrets.TFC_TOKEN }}
           organization: ${{ env.TF_ORGANIZATION }}
           speculative: false
       - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
         with:
-          workspace: ${{ inputs.geo }}
+          workspace: ${{ env.TF_WORKSPACE }}
           configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
           token: ${{ secrets.TFC_TOKEN }}
           organization: ${{ env.TF_ORGANIZATION }}
