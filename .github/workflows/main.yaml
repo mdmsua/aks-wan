@@ -41,7 +41,7 @@ jobs:
       run: |
         cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc '.configuration')
         echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
-        echo "ref=$(cat $cfg | jq -rc '.version')" >> "$GITHUB_OUTPUT"
+        echo "ref=$(echo '$cfg' | jq -rc '.version')" >> "$GITHUB_OUTPUT"
         echo "wss=$(jq -nrc --arg workspace $GEO '{ workspaces: { wan: [$workspace] } }')" >> "$GITHUB_OUTPUT"
       env:
         GEO: ${{ inputs.geo }}
