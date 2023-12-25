@@ -31,28 +31,20 @@ jobs:
       reference: ${{ steps.cfg.outputs.ref }}
       workspace: ${{ steps.cfg.outputs.wss }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: mdmsua/aks-cfg
-        ref: ${{ inputs.cfg }}
-        show-progress: false
-    - id: cfg
-      working-directory: wan
-      run: |
-        cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc '.configuration')
-        echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
-        echo "ref=$(echo $cfg | jq -rc '.version')" >> "$GITHUB_OUTPUT"
-        echo "wss=$(jq -nrc --arg workspace $GEO '{ workspaces: { wan: [$workspace] } }')" >> "$GITHUB_OUTPUT"
-      env:
-        GEO: ${{ inputs.geo }}
-  debug:
-    needs: configuration
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo $workspaces
-      env:
-        workspaces: ${{ needs.configuration.outputs.workspace }}
+      - uses: actions/checkout@v4
+        with:
+          repository: mdmsua/aks-cfg
+          ref: ${{ inputs.cfg }}
+          show-progress: false
+      - id: cfg
+        working-directory: wan
+        run: |
+          cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc '.configuration')
+          echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
+          echo "ref=$(echo $cfg | jq -rc '.version')" >> "$GITHUB_OUTPUT"
+          echo "wss=$(jq -nrc --arg workspace $GEO '{wan:[$workspace]}')" >> "$GITHUB_OUTPUT"
+        env:
+          GEO: ${{ inputs.geo }}
   workspace:
     uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
     with:
@@ -65,34 +57,34 @@ jobs:
     runs-on: ubuntu-latest
     environment: main
     needs:
-    - configuration
-    - workspace
+      - configuration
+      - workspace
     steps:
-    - uses: actions/checkout@v4
-      with:
-        show-progress: false
-        ref: ${{ needs.configuration.outputs.reference }}
-    - uses: hashicorp/setup-terraform@v3
-      with:
-        cli_config_credentials_token: ${{ secrets.TFC_TOKEN }}
-    - run: |
-        terraform init
-        terraform validate
-      env:
-        TF_WORKSPACE: ${{ inputs.geo }}
-    - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
-      id: upload
-      with:
-        workspace: ${{ inputs.geo }}
-        directory: .
-        token: ${{ secrets.TFC_TOKEN }}
-        organization: ${{ env.TF_ORGANIZATION }}
-        speculative: false
-    - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
-      with:
-        workspace: ${{ inputs.geo }}
-        configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
-        token: ${{ secrets.TFC_TOKEN }}
-        organization: ${{ env.TF_ORGANIZATION }}
-      env:
-        TF_VAR_configuration: ${{ needs.configuration.outputs.configuration }}
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
+          ref: ${{ needs.configuration.outputs.reference }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TFC_TOKEN }}
+      - run: |
+          terraform init
+          terraform validate
+        env:
+          TF_WORKSPACE: ${{ inputs.geo }}
+      - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
+        id: upload
+        with:
+          workspace: ${{ inputs.geo }}
+          directory: .
+          token: ${{ secrets.TFC_TOKEN }}
+          organization: ${{ env.TF_ORGANIZATION }}
+          speculative: false
+      - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
+        with:
+          workspace: ${{ inputs.geo }}
+          configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
+          token: ${{ secrets.TFC_TOKEN }}
+          organization: ${{ env.TF_ORGANIZATION }}
+        env:
+          TF_VAR_configuration: ${{ needs.configuration.outputs.configuration }}
