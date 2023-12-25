@@ -45,6 +45,14 @@ jobs:
         echo "wss=$(jq -nrc --arg workspace $GEO '{ workspaces: { wan: [$workspace] } }')" >> "$GITHUB_OUTPUT"
       env:
         GEO: ${{ inputs.geo }}
+  debug:
+    needs: configuration
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo $workspaces
+      env:
+        workspaces: ${{ needs.configuration.outputs.workspace }}
   workspace:
     uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
     with:
