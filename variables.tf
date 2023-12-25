@@ -1,6 +1,7 @@
 variable "configuration" {
   type = object({
     version         = string
+    name            = string
     location        = string
     tenant_id       = string
     subscription_id = string

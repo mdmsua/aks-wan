@@ -1,7 +1,7 @@
 # https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming
 module "naming" {
   source = "Azure/naming/azurerm"
-  suffix = ["mega", terraform.workspace, var.configuration.location]
+  suffix = ["mega", var.configuration.name, var.configuration.location]
 }
 
 resource "azurerm_resource_group" "mega" {
