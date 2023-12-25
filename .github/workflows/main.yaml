@@ -60,6 +60,8 @@ jobs:
     needs:
       - configuration
       - workspace
+    outputs:
+      run_link: ${{ steps.run.outputs.run_link }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,6 +82,7 @@ jobs:
           organization: ${{ env.TF_ORGANIZATION }}
           speculative: false
       - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
+        id: run
         with:
           workspace: ${{ env.TF_WORKSPACE }}
           configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
