@@ -1,10 +1,5 @@
 terraform {
-  cloud {
-    organization = "Megamango"
-    workspaces {
-      project = "wan"
-    }
-  }
+  cloud {}
 
   required_providers {
     azurerm = {
@@ -15,11 +10,9 @@ terraform {
 }
 
 provider "azurerm" {
-  tenant_id       = var.configuration.tenant_id
-  subscription_id = var.configuration.subscription_id
   features {
     resource_group {
-      prevent_deletion_if_contains_resources = true
+      prevent_deletion_if_contains_resources = false
     }
   }
 }

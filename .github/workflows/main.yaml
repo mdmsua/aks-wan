@@ -1,5 +1,5 @@
 name: Deploy virtual WAN
-concurrency: ${{ inputs.geo }}
+concurrency: ${{ inputs.wan }}-${{ inputs.env }}
 
 permissions:
   contents: read
@@ -8,16 +8,27 @@ permissions:
 env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
-  TF_ORGANIZATION: Megamango
-  TF_WORKSPACE: wan-${{ inputs.geo }}
+  TF_ORGANIZATION: Terratron
+  TF_WORKSPACE: wan-${{ inputs.wan }}-${{ inputs.env }}
 
 on:
   workflow_dispatch:
     inputs:
-      geo:
+      wan:
         required: true
-        type: string
-        description: Virtual WAN geography
+        type: choice
+        description: Virtual WAN name
+        options:
+          - eu
+          - us
+      env:
+        required: true
+        type: choice
+        description: Virtual WAN environment
+        options:
+          - dev
+          - test
+          - live
       cfg:
         required: false
         type: string
@@ -25,55 +36,36 @@ on:
         default: main
 
 jobs:
-  configuration:
+  main:
     runs-on: ubuntu-latest
-    outputs:
-      configuration: ${{ steps.cfg.outputs.cfg }}
-      reference: ${{ steps.cfg.outputs.ref }}
-      workspace: ${{ steps.cfg.outputs.wss }}
+    environment:
+      name: tfc
+      url: ${{ steps.run.outputs.run_link }}
     steps:
       - uses: actions/checkout@v4
         with:
           repository: mdmsua/aks-cfg
           ref: ${{ inputs.cfg }}
           show-progress: false
-      - id: cfg
-        working-directory: wan
+      - id: variant
+        working-directory: wans
         run: |
-          cfg=$(kubectl kustomize overlays/$GEO | yq 'del(.kind)|del(.metadata)' -o json | jq -rc '.configuration')
-          echo "cfg=$cfg" >> "$GITHUB_OUTPUT"
-          echo "ref=$(echo $cfg | jq -rc '.version')" >> "$GITHUB_OUTPUT"
-          echo "wss=$(jq -nrc --arg workspace $GEO '{wan:[$workspace]}')" >> "$GITHUB_OUTPUT"
+          spec=$(kustomize build overlays/$WAN | yq -o json | jq -rc '.spec')
+          echo "spec=$spec" >> "$GITHUB_OUTPUT
+          echo "version=$(echo $spec | jq -rc '.version')" >> "$GITHUB_OUTPUT"
         env:
-          GEO: ${{ inputs.geo }}
-  workspace:
-    uses: mdmsua/aks-tfe/.github/workflows/main.yaml@main
-    with:
-      workspaces: ${{ needs.configuration.outputs.workspace }}
-    secrets:
-      tfc-token: ${{ secrets.TFC_TOKEN }}
-      tfe-token: ${{ secrets.TFE_TOKEN }}
-    needs: configuration
-  main:
-    runs-on: ubuntu-latest
-    environment: main
-    needs:
-      - configuration
-      - workspace
-    outputs:
-      run_link: ${{ steps.run.outputs.run_link }}
-    steps:
+          WAN: ${{ inputs.wan }}-${{ inputs.env }}
       - uses: actions/checkout@v4
         with:
           show-progress: false
-          ref: ${{ needs.configuration.outputs.reference }}
+          ref: ${{ steps.variant.outputs.version }}
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TFC_TOKEN }}
       - run: |
           terraform init
           terraform validate
-      - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.1.1
+      - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.2.0
         id: upload
         with:
           workspace: ${{ env.TF_WORKSPACE }}
@@ -81,7 +73,7 @@ jobs:
           token: ${{ secrets.TFC_TOKEN }}
           organization: ${{ env.TF_ORGANIZATION }}
           speculative: false
-      - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.1.1
+      - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.2.0
         id: run
         with:
           workspace: ${{ env.TF_WORKSPACE }}
@@ -89,4 +81,4 @@ jobs:
           token: ${{ secrets.TFC_TOKEN }}
           organization: ${{ env.TF_ORGANIZATION }}
         env:
-          TF_VAR_configuration: ${{ needs.configuration.outputs.configuration }}
+          TF_VAR_spec: ${{ steps.variant.outputs.spec }}

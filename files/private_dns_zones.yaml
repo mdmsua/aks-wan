@@ -1,0 +1,105 @@
+# AI + Machine Learning
+- privatelink.api.azureml.ms
+- privatelink.notebooks.azure.net
+- privatelink.cognitiveservices.azure.com
+- privatelink.openai.azure.com
+- privatelink.directline.botframework.com
+- privatelink.token.botframework.com
+
+# Analytics
+- privatelink.sql.azuresynapse.net
+- privatelink.dev.azuresynapse.net
+- privatelink.azuresynapse.net
+- privatelink.servicebus.windows.net
+- privatelink.datafactory.azure.net
+- privatelink.adf.azure.com
+- privatelink.azurehdinsight.net
+- privatelink.*.kusto.windows.net
+- privatelink.blob.core.windows.net
+- privatelink.queue.core.windows.net
+- privatelink.table.core.windows.net
+- privatelink.analysis.windows.net
+- privatelink.pbidedicated.windows.net
+- privatelink.tip1.powerquery.microsoft.com
+- privatelink.azuredatabricks.net
+
+# Compute
+- "*.privatelink.batch.azure.com"
+- "*.service.privatelink.batch.azure.com"
+- privatelink-global.wvd.microsoft.com
+- privatelink.wvd.microsoft.com
+
+# Containers
+- privatelink.*.azmk8s.io
+- privatelink.azurecr.io
+- "*.data.privatelink.azurecr.io"
+
+# Databases
+- privatelink.database.windows.net
+- privatelink.documents.azure.com
+- privatelink.mongo.cosmos.azure.com
+- privatelink.cassandra.cosmos.azure.com
+- privatelink.gremlin.cosmos.azure.com
+- privatelink.table.cosmos.azure.com
+- privatelink.analytics.cosmos.azure.com
+- privatelink.postgres.cosmos.azure.com
+- privatelink.postgres.database.azure.com
+- privatelink.mysql.database.azure.com
+- privatelink.mariadb.database.azure.com
+- privatelink.redis.cache.windows.net
+- privatelink.redisenterprise.cache.azure.net
+
+# Hybrid + multicloud
+- privatelink.his.arc.azure.com
+- privatelink.guestconfiguration.azure.com
+- privatelink.dp.kubernetesconfiguration.azure.com
+
+# Integration
+- privatelink.eventgrid.azure.net
+- privatelink.azure-api.net
+- privatelink.workspace.azurehealthcareapis.com
+- privatelink.fhir.azurehealthcareapis.com
+- privatelink.dicom.azurehealthcareapis.com
+
+# IoT
+- privatelink.azure-devices.net
+- privatelink.azure-devices-provisioning.net
+- privatelink.api.adu.microsoft.com
+- privatelink.azureiotcentral.com
+- privatelink.digitaltwins.azure.net
+
+# Media
+- privatelink.media.azure.net
+
+# Management and Governance
+- privatelink.azure-automation.net
+- privatelink.*.backup.windowsazure.com
+- privatelink.siterecovery.windowsazure.com
+- privatelink.monitor.azure.com
+- privatelink.oms.opinsights.azure.com
+- privatelink.ods.opinsights.azure.com
+- privatelink.agentsvc.azure-automation.net
+- privatelink.purview.azure.com
+- privatelink.purviewstudio.azure.com
+- privatelink.prod.migration.windowsazure.com
+- privatelink.azure.com
+- privatelink.grafana.azure.com
+
+# Security
+- privatelink.vaultcore.azure.net
+- privatelink.managedhsm.azure.net
+- privatelink.azconfig.io
+- privatelink.attest.azure.net
+
+# Storage
+- privatelink.file.core.windows.net
+- privatelink.web.core.windows.net
+- privatelink.dfs.core.windows.net
+- privatelink.afs.azure.net
+
+# Web
+- privatelink.search.windows.net
+- privatelink.azurewebsites.net
+- scm.privatelink.azurewebsites.net
+- privatelink.service.signalr.net
+- privatelink.azurestaticapps.net

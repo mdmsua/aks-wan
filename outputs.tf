@@ -1,20 +1,19 @@
 output "name" {
-  value = azurerm_virtual_wan.mega.name
+  value       = azurerm_virtual_wan.main.name
+  description = "Virtual WAN name"
 }
 
 output "resource_group_name" {
-  value = azurerm_virtual_wan.mega.resource_group_name
+  value       = azurerm_virtual_wan.main.resource_group_name
+  description = "Virtual WAN resource group name"
 }
 
 output "subscription_id" {
-  value = data.azurerm_subscription.mega.subscription_id
+  value       = data.azurerm_subscription.main.subscription_id
+  description = "Virtual WAN subscription ID"
 }
 
-output "cidrs" {
-  value = {
-    for hub in var.configuration.hubs : hub => {
-      hub : module.hubs.network_cidr_blocks[hub]
-      networks : [module.networks_v4.network_cidr_blocks[hub], module.networks_v6.network_cidr_blocks[hub]]
-    }
-  }
+output "private_dns_zones" {
+  value       = [azurerm_private_dns_zone.main[*].name]
+  description = "List of private DNS zones"
 }
