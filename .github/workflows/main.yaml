@@ -1,5 +1,5 @@
 name: Deploy virtual WAN
-concurrency: ${{ inputs.wan }}-${{ inputs.env }}
+concurrency: ${{ inputs.env }}-${{ inputs.wan }}
 
 permissions:
   contents: read
@@ -9,7 +9,7 @@ env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
   TF_ORGANIZATION: Terratron
-  TF_WORKSPACE: wan-${{ inputs.wan }}-${{ inputs.env }}
+  TF_WORKSPACE: wan-${{ inputs.env }}-${{ inputs.wan }}
 
 on:
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
           echo "spec=$spec" >> "$GITHUB_OUTPUT
           echo "version=$(echo $spec | jq -rc '.version')" >> "$GITHUB_OUTPUT"
         env:
-          WAN: ${{ inputs.wan }}-${{ inputs.env }}
+          WAN: ${{ inputs.env }}-${{ inputs.wan }}
       - uses: actions/checkout@v4
         with:
           show-progress: false
