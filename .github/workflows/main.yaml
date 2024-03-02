@@ -51,7 +51,7 @@ jobs:
         working-directory: wans
         run: |
           spec=$(kustomize build overlays/$WAN | yq -o json | jq -rc '.spec')
-          echo "spec=$spec" >> "$GITHUB_OUTPUT
+          echo "spec=$spec" >> "$GITHUB_OUTPUT"
           echo "version=$(echo $spec | jq -rc '.version')" >> "$GITHUB_OUTPUT"
         env:
           WAN: ${{ inputs.env }}-${{ inputs.wan }}
