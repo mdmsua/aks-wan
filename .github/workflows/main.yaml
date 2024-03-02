@@ -8,7 +8,7 @@ permissions:
 env:
   TF_INPUT: 0
   TF_IN_AUTOMATION: 1
-  TF_ORGANIZATION: Terratron
+  TF_CLOUD_ORGANIZATION: Terratron
   TF_WORKSPACE: wan-${{ inputs.env }}-${{ inputs.wan }}
 
 on:
@@ -37,6 +37,7 @@ on:
 
 jobs:
   main:
+    name: Deploy virtual WAN ${{ inputs.wan }} in ${{ inputs.env }}
     runs-on: ubuntu-latest
     environment:
       name: tfc
@@ -71,7 +72,7 @@ jobs:
           workspace: ${{ env.TF_WORKSPACE }}
           directory: .
           token: ${{ secrets.TFC_TOKEN }}
-          organization: ${{ env.TF_ORGANIZATION }}
+          organization: ${{ env.TF_CLOUD_ORGANIZATION }}
           speculative: false
       - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.2.0
         id: run
@@ -79,6 +80,6 @@ jobs:
           workspace: ${{ env.TF_WORKSPACE }}
           configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
           token: ${{ secrets.TFC_TOKEN }}
-          organization: ${{ env.TF_ORGANIZATION }}
+          organization: ${{ env.TF_CLOUD_ORGANIZATION }}
         env:
           TF_VAR_spec: ${{ steps.variant.outputs.spec }}
