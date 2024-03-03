@@ -14,6 +14,6 @@ output "subscription_id" {
 }
 
 output "private_dns_zones" {
-  value       = [azurerm_private_dns_zone.main[*].name]
+  value       = [for zone in azurerm_private_dns_zone.main : zone.name]
   description = "List of private DNS zones"
 }
